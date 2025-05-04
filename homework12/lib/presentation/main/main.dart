@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:homework12/presentation/widgets/weather_list.dart';
 import 'package:homework12/repositories/weather_repository.dart';
 
+import '../../models/weather_response_model/weather_response_model.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -34,7 +36,13 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final WeatherRepository _weatherRepository = WeatherRepository();
 
-  Widget weatherList = WeatherList();
+  Future<WeatherResponse>? _future;
+
+  void _refreshFuture() {
+    setState(() {
+      _future = _weatherRepository.getWeather();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,13 +54,11 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         child: SizedBox(
           width: MediaQuery.of(context).size.width / 1.4,
-          child: Center(
-              child: weatherList),
+          child: Center(child: WeatherList(future: _future)),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed:
-            () => _weatherRepository.getWeather(),
+        onPressed: () => _refreshFuture(),
         child: const Icon(Icons.download),
       ),
     );

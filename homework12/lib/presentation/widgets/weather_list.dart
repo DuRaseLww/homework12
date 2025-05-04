@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:homework12/models/weather_response_model/weather_response_model.dart';
-import 'package:homework12/repositories/weather_repository.dart';
 
-class WeatherList extends StatefulWidget {
-  const WeatherList({super.key});
+class WeatherList extends StatelessWidget {
+  final Future<WeatherResponse>? future;
 
-  @override
-  State<StatefulWidget> createState() => _WeatherListState();
-}
+  const WeatherList({super.key, required this.future});
 
-class _WeatherListState extends State<WeatherList> {
-  final WeatherRepository _weatherRepository = WeatherRepository();
-  late final WeatherResponse _weatherResponse;
 
   @override
   Widget build(BuildContext context) {
+
+    if (future == null) {
+      return const SizedBox.shrink();
+    }
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         FutureBuilder(
-          future: _weatherRepository.getWeather(),
+          future: future,
           builder: (context, snapshot) {
+            final data = snapshot.data;
+
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
                 child: Column(
@@ -30,21 +31,21 @@ class _WeatherListState extends State<WeatherList> {
                   ],
                 ),
               );
-            }
+            };
 
             if (snapshot.hasError) {
               return Text('Error receiving data :(');
-            }
+            };
 
-            if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.connectionState == ConnectionState.done && data != null) {
               return Center(
                 child: ListView(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
                   children: [
-                    Text(_weatherResponse.name),
-                    Text(_weatherResponse.main.temp.toString()),
-                    Text(_weatherResponse.main.pressure.toString()),
+                    Text(data.name),
+                    Text(data.main.temp.toString()),
+                    Text(data.main.pressure.toString()),
                   ],
                 ),
               );
